@@ -3,6 +3,8 @@
 *.a
 *.so
 
+/massert
+
 # Folders
 _obj
 _test
@@ -22,3 +24,16 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+/bin/*
+/pkg/*
+
+/src/github.com/derekparker/*
+/src/github.com/nsf/*
+/src/github.com/sqs/*
+/src/github.com/zmb3/*
+/src/github.com/alecthomas/*
+/src/github.com/rogpeppe/*
+
+/src/golang.org/x/tools/*
+/src/golang.org/x/tools
