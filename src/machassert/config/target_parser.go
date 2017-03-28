@@ -18,6 +18,11 @@ func ParseTargetSchema(data []byte) (*MachineSpec, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	err = validateMachineSpec(&outSpec)
+	if err != nil {
+		return nil, err
+	}
 	return &outSpec, nil
 }
 
@@ -29,4 +34,15 @@ func ParseTargetSpecFile(fpath string) (*MachineSpec, error) {
 	}
 
 	return ParseTargetSchema(d)
+}
+
+func validateMachineSpec(spec *MachineSpec) error {
+	for k := range spec.Machine {
+		for i := range spec.Machine[k].Auth {
+			if spec.Machine[k].Auth[i].Password != "" { //If password is set, set the auth kind to password
+				spec.Machine[k].Auth[i].Kind = AuthKindPassword
+			}
+		}
+	}
+	return nil
 }
