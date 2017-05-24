@@ -6,7 +6,32 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-func TestBasicTargetsParse(t *testing.T) {
+func TestLocalBasicTargetsParse(t *testing.T) {
+	spec, err := ParseTargetSpecFile("testdata/targets/localbasic.hcl")
+	if err != nil {
+		t.Error(err)
+	}
+	if spec == nil {
+		t.Error("Non-nil spec expected")
+	}
+
+	if spec.Name != "" {
+		t.Error("Spec name should be empty")
+	}
+
+	m1 := spec.Machine["local-1"]
+	if m1.Kind != KindLocal || m1.Destination != "" {
+		t.Error("Incorrect data, got: ", spew.Sdump(spec.Machine))
+	}
+
+	m2 := spec.Machine["local-2"]
+	// kind = 'local' is not specified, so it should be populated by normalizeMachineSpec()
+	if m2.Kind != KindLocal || m2.Destination != "" {
+		t.Error("Incorrect data, got: ", spew.Sdump(spec.Machine))
+	}
+}
+
+func TestSSHBasicTargetsParse(t *testing.T) {
 	spec, err := ParseTargetSpecFile("testdata/targets/sshbasic.hcl")
 	if err != nil {
 		t.Error(err)
@@ -41,6 +66,14 @@ func TestBasicTargetsParseErrorCases(t *testing.T) {
 	}
 
 	spec, err = ParseTargetSpecFile("testdata/targets/invalid_hcl.hcl")
+	if err == nil {
+		t.Error("Error expected")
+	}
+	if spec != nil {
+		t.Error("nil spec expected")
+	}
+
+	spec, err = ParseTargetSpecFile("testdata/targets/invalid_machinespec_kind.hcl")
 	if err == nil {
 		t.Error("Error expected")
 	}

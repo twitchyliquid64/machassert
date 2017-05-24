@@ -44,6 +44,11 @@ func ParseTargetSpecFile(fpath string) (*MachineSpec, error) {
 
 func normalizeMachineSpec(spec *MachineSpec) error {
 	for k := range spec.Machine {
+
+		if spec.Machine[k].Kind == "" {
+			spec.Machine[k].Kind = KindLocal
+		}
+
 		for i := range spec.Machine[k].Auth {
 			if spec.Machine[k].Auth[i].Password != "" { //If password is set, set the auth kind to password
 				spec.Machine[k].Auth[i].Kind = AuthKindPassword
@@ -55,11 +60,19 @@ func normalizeMachineSpec(spec *MachineSpec) error {
 
 func validateMachineSpec(spec *MachineSpec) error {
 	for k := range spec.Machine {
+
+		switch spec.Machine[k].Kind {
+		case KindLocal:
+		case KindSSH:
+		default:
+			return errors.New("")
+		}
+
 		for i := range spec.Machine[k].Auth {
 			switch spec.Machine[k].Auth[i].Kind {
 			case AuthKindPassword:
 				if spec.Machine[k].Auth[i].Password == "" {
-					return errors.New("Password must be specified for password authentication")
+					return errors.New("password must be specified for password authentication")
 				}
 			default:
 				return errors.New("Invalid machine auth type")

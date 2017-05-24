@@ -1,19 +1,20 @@
 package config
 
+// Valid machine types
 const (
-	// KindLocal represents the machine the binary is executing on.
 	KindLocal string = "local"
-	// KindSSH represents a machine accessible via SSH.
 	KindSSH string = "ssh"
+)
 
-	//AuthKindPassword represents password authentication
+// Valid authentication means/types
+const (
 	AuthKindPassword = "password"
 )
 
-//MachineSpec describes the high-level schema for target configuration.
+// MachineSpec describes the high-level schema for target configuration.
 type MachineSpec struct {
 	Name    string
-	Machine map[string]Machine
+	Machine map[string]*Machine
 }
 
 //Machine describes the target schema for a specific machine.

@@ -4,8 +4,8 @@ package config
 func DefaultTarget() *MachineSpec {
 	return &MachineSpec{
 		Name: "local",
-		Machine: map[string]Machine{
-			"local": Machine{
+		Machine: map[string]*Machine{
+			"local": &Machine{
 				Kind: KindLocal,
 			},
 		},
