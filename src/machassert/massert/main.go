@@ -79,6 +79,10 @@ func main() {
 	case "assert":
 		e := engine.New(targets, assertions)
 		err = e.Run()
+		if err != nil && err == engine.ErrAssertionsFailed {
+			fmt.Println(engine.Red("Error") + ": Assertions failed")
+			os.Exit(1)
+		}
 		if err != nil {
 			fmt.Println("Err:", err.Error())
 			os.Exit(1)

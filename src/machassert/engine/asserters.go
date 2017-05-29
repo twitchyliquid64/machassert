@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+// ErrAssertionsFailed is returned if spec execution is short-circuited due to assertion failure.
+var ErrAssertionsFailed = errors.New("assertions failed")
+
 // Assertion Results
 const (
 	AssertionNoop int = iota
@@ -60,7 +63,7 @@ func doAction(machine Machine, assertion *config.Assertion, action *config.Actio
 	case "":
 		return nil
 	case "FAIL":
-		return errors.New("assertion suite failed")
+		return ErrAssertionsFailed
 	default:
 		return errors.New("Unrecognised actions kind")
 	}
