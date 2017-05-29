@@ -3,7 +3,7 @@ package config
 // Valid machine types
 const (
 	KindLocal string = "local"
-	KindSSH string = "ssh"
+	KindSSH   string = "ssh"
 )
 
 // Valid authentication means/types
