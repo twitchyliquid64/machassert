@@ -78,6 +78,8 @@ func (l *ConsoleLogger) paint() {
 				fmt.Print(Red(assertionInfo.result.String()))
 			} else if assertionInfo.result.Result == AssertionApplied {
 				fmt.Print(Yellow(assertionInfo.result.String()))
+			} else {
+				fmt.Print(Red(assertionInfo.result.String()))
 			}
 		}
 

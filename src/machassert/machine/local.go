@@ -19,3 +19,7 @@ func (m *Local) Name() string {
 func (m *Local) ReadFile(fpath string) (io.ReadCloser, error) {
 	return os.Open(fpath)
 }
+
+func (m *Local) Close() error {
+	return nil
+}

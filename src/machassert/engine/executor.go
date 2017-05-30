@@ -35,8 +35,13 @@ func (e *Executor) Run() error {
 		for _, assertions := range e.assertions {
 			err = e.runAssertionOnMachine(m, assertions)
 			if err != nil {
+				m.Close()
 				return err
 			}
+		}
+		err = m.Close()
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -58,6 +63,8 @@ func connect(name string, m *config.Machine) (Machine, error) {
 	switch m.Kind {
 	case config.KindLocal:
 		return machine.ConnectLocal(name, m)
+	case config.KindSSH:
+		return machine.ConnectRemote(name, m)
 	}
 	return nil, errors.New("Could not interpret machine kind")
 }

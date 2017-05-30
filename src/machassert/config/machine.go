@@ -21,6 +21,7 @@ type MachineSpec struct {
 type Machine struct {
 	Kind        string
 	Destination string //only valid for non local machines
+	Username    string //only needed for SSH
 	Auth        []MachineAuth
 }
 
