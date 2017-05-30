@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"io/ioutil"
 
 	"github.com/hashicorp/hcl"
@@ -19,6 +20,12 @@ func ParseAssertionsSchema(data []byte) (*AssertionSpec, error) {
 		return nil, err
 	}
 
+	err = checkAssertionSpec(&outSpec)
+	if err != nil {
+		return nil, err
+	}
+
+	normaliseAssertionSpec(&outSpec)
 	return &outSpec, nil
 }
 
@@ -30,4 +37,27 @@ func ParseAssertionsSpecFile(fpath string) (*AssertionSpec, error) {
 	}
 
 	return ParseAssertionsSchema(d)
+}
+
+func normaliseAssertionSpec(spec *AssertionSpec) {
+	for i := range spec.Assertions {
+		if len(spec.Assertions[i].Actions) == 0 {
+			spec.Assertions[i].Actions = []*Action{&Action{Kind: ActionFail}}
+		}
+	}
+}
+
+func checkAssertionSpec(spec *AssertionSpec) error {
+	for name, a := range spec.Assertions {
+		if name == "" {
+			return errors.New("name must be specified for an assertion")
+		}
+		switch a.Kind {
+		case FileExistsAssrt:
+		case FileNotExistsAssrt:
+		default:
+			return errors.New("unsupported assertion type/kind")
+		}
+	}
+	return nil
 }

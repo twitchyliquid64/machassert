@@ -6,6 +6,11 @@ const (
 	FileNotExistsAssrt string = "!exists"
 )
 
+// Action kinds
+const (
+	ActionFail string = "FAIL"
+)
+
 // AssertionSpec describes the high-level schema for a file containing assertions.
 type AssertionSpec struct {
 	Name       string

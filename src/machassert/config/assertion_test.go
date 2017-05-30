@@ -34,3 +34,13 @@ func TestSimpleAssertionParse(t *testing.T) {
 		t.Errorf("Got kind=%q, wanted 'FAIL'", a1.Actions[0].Kind)
 	}
 }
+
+func TestSimpleAssertionErrors(t *testing.T) {
+	_, err := ParseAssertionsSpecFile("testdata/assertions/badkind.hcl")
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "unsupported assertion type/kind" {
+		t.Errorf("Got %q, Want 'unsupported assertion type/kind'", err)
+	}
+}

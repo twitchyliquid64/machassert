@@ -27,7 +27,7 @@ func (r AssertionResult) String() string {
 	case AssertionNoop:
 		return "OK"
 	case AssertionFailed:
-		return "FAIL"
+		return "FAILED"
 	case AssertionApplied:
 		return "APPLIED"
 	case AssertionError:
@@ -49,6 +49,9 @@ func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionRes
 	if err == nil && result.Result == AssertionApplied {
 		for _, action := range assertion.Actions {
 			err = doAction(machine, assertion, action)
+			if err == ErrAssertionsFailed {
+				result.Result = AssertionFailed
+			}
 			if err != nil {
 				return result, err
 			}
