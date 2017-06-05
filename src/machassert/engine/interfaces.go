@@ -8,5 +8,6 @@ import (
 type Machine interface {
 	Name() string
 	ReadFile(fpath string) (io.ReadCloser, error)
+	Hash(fpath string) ([]byte, error)
 	Close() error
 }

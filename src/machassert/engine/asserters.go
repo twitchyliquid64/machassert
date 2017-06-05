@@ -1,9 +1,11 @@
 package engine
 
 import (
+	"encoding/hex"
 	"errors"
 	"machassert/config"
 	"os"
+	"strings"
 )
 
 // ErrAssertionsFailed is returned if spec execution is short-circuited due to assertion failure.
@@ -42,7 +44,9 @@ func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionRes
 	var err error
 
 	switch assertion.Kind {
-	case "exists":
+	case config.HashMatchAssrt:
+		result, err = applyHashAssertion(machine, assertion)
+	case config.FileExistsAssrt:
 		result, err = applyExistsAssertion(machine, assertion)
 	}
 
@@ -75,12 +79,22 @@ func doAction(machine Machine, assertion *config.Assertion, action *config.Actio
 func applyExistsAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
 	f, err := machine.ReadFile(assertion.FilePath)
 	if err != nil && os.IsNotExist(err) {
-		//TODO: Run action
 		return &AssertionResult{Result: AssertionApplied}, nil
 	}
 	if err != nil {
 		return &AssertionResult{Result: AssertionError}, err
 	}
 	f.Close()
+	return &AssertionResult{Result: AssertionNoop}, nil
+}
+
+func applyHashAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
+	hash, err := machine.Hash(assertion.FilePath)
+	if err != nil {
+		return &AssertionResult{Result: AssertionError}, err
+	}
+	if hex.EncodeToString(hash) != strings.ToLower(assertion.Hash) {
+		return &AssertionResult{Result: AssertionApplied}, nil
+	}
 	return &AssertionResult{Result: AssertionNoop}, nil
 }

@@ -54,7 +54,15 @@ func checkAssertionSpec(spec *AssertionSpec) error {
 		}
 		switch a.Kind {
 		case FileExistsAssrt:
+			fallthrough
 		case FileNotExistsAssrt:
+			if a.FilePath == "" {
+				return errors.New("file_path must be specified for exists and !exists assertions")
+			}
+		case HashMatchAssrt:
+			if a.Hash == "" || a.FilePath == "" {
+				return errors.New("hash/file_path must be specified for md5_match assertions")
+			}
 		default:
 			return errors.New("unsupported assertion type/kind")
 		}

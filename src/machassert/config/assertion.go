@@ -4,6 +4,7 @@ package config
 const (
 	FileExistsAssrt    string = "exists"
 	FileNotExistsAssrt string = "!exists"
+	HashMatchAssrt     string = "md5_match"
 )
 
 // Action kinds
@@ -23,6 +24,8 @@ type Assertion struct {
 
 	// FileExistsAssrt & FileNotExistsAssrt
 	FilePath string `hcl:"file_path"`
+	// HashMatchAssrt
+	Hash string //hex-encoded hash bytes
 
 	Actions []*Action `hcl:"or"`
 }

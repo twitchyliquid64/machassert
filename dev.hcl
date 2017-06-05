@@ -10,7 +10,8 @@ assert "check echo" {
   file_path = "/bin/echo"
 }
 
-assert "check subshard" {
-  kind = "exists"
-  file_path = "/Applications/Subshard.app/Contents/MacOS/bin/subshard"
+assert "check hash" {
+  kind = "md5_match"
+  file_path = "/bin/ls"
+  hash = "970be6a05c1ccbadbcece0c6db9b3882"
 }

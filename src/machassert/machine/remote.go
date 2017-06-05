@@ -2,9 +2,11 @@ package machine
 
 import (
 	"bytes"
+	"encoding/hex"
 	"io"
 	"machassert/config"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -70,6 +72,37 @@ func (r *Remote) ReadFile(fpath string) (io.ReadCloser, error) {
 	out := &readFileRemoteReadCloser{session: s}
 	s.Stdout = &out.buff
 	return out, nil
+}
+
+func (r *Remote) Run(name string, args []string) ([]byte, error) {
+	var out bytes.Buffer
+	s, err := r.conn.NewSession()
+	if err != nil {
+		return nil, err
+	}
+	s.Stdout = &out
+
+	for i := range args {
+		if strings.ContainsAny(args[i], " |\"'") {
+			args[i] = "\"" + strings.Replace(args[i], "\"", "\\\"", -1) + "\""
+		}
+	}
+
+	err = s.Run(name + " " + strings.Join(args, " "))
+	if err != nil {
+		return nil, err
+	}
+	return out.Bytes(), nil
+}
+
+// MD5 returns the hash of the file at the given path.
+func (m *Remote) Hash(fpath string) ([]byte, error) {
+	o, err := m.Run("md5sum", []string{fpath})
+	if err != nil {
+		return nil, err
+	}
+	hashStr := strings.Trim(strings.Split(string(o), " ")[0], "\n\t ")
+	return hex.DecodeString(hashStr)
 }
 
 func (r *Remote) Name() string {
