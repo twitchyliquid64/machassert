@@ -33,6 +33,12 @@ func TestSimpleAssertionParse(t *testing.T) {
 	if a1.Actions[0].Kind != "FAIL" {
 		t.Errorf("Got kind=%q, wanted 'FAIL'", a1.Actions[0].Kind)
 	}
+
+	if spec.Assertions["thing"] == nil {
+		t.Fatal("No assertion 'thing'")
+	}
+	a2 := spec.Assertions["thing"]
+	t.Log(spew.Sdump(a2))
 }
 
 func TestSimpleAssertionErrors(t *testing.T) {

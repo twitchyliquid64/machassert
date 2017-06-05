@@ -47,24 +47,44 @@ func normaliseAssertionSpec(spec *AssertionSpec) {
 	}
 }
 
+func checkAssertion(a *Assertion) error {
+	switch a.Kind {
+	case FileExistsAssrt:
+		fallthrough
+	case FileNotExistsAssrt:
+		if a.FilePath == "" {
+			return errors.New("file_path must be specified for exists and !exists assertions")
+		}
+	case HashMatchAssrt:
+		if a.Hash == "" || a.FilePath == "" {
+			return errors.New("hash/file_path must be specified for md5_match assertions")
+		}
+	default:
+		return errors.New("unsupported assertion type/kind")
+	}
+
+	for _, action := range a.Actions {
+		switch action.Kind {
+		case ActionFail:
+		case ActionApplyFile:
+			if action.SourcePath == "" || action.DestinationPath == "" {
+				return errors.New("source_path/destination_path must be specified for APPLY actions")
+			}
+		default:
+			return errors.New("unsupported action type/kind")
+		}
+	}
+	return nil
+}
+
 func checkAssertionSpec(spec *AssertionSpec) error {
 	for name, a := range spec.Assertions {
 		if name == "" {
 			return errors.New("name must be specified for an assertion")
 		}
-		switch a.Kind {
-		case FileExistsAssrt:
-			fallthrough
-		case FileNotExistsAssrt:
-			if a.FilePath == "" {
-				return errors.New("file_path must be specified for exists and !exists assertions")
-			}
-		case HashMatchAssrt:
-			if a.Hash == "" || a.FilePath == "" {
-				return errors.New("hash/file_path must be specified for md5_match assertions")
-			}
-		default:
-			return errors.New("unsupported assertion type/kind")
+		err := checkAssertion(a)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

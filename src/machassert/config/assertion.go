@@ -9,7 +9,8 @@ const (
 
 // Action kinds
 const (
-	ActionFail string = "FAIL"
+	ActionFail      string = "FAIL"
+	ActionApplyFile string = "APPLY"
 )
 
 // AssertionSpec describes the high-level schema for a file containing assertions.
@@ -31,5 +32,7 @@ type Assertion struct {
 }
 
 type Action struct {
-	Kind string `hcl:"action"`
+	Kind            string `hcl:"action"`
+	SourcePath      string `hcl:"source_path"`
+	DestinationPath string `hcl:"destination_path"`
 }

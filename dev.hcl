@@ -10,8 +10,12 @@ assert "check echo" {
   file_path = "/bin/echo"
 }
 
-assert "check hash" {
-  kind = "md5_match"
-  file_path = "/bin/ls"
-  hash = "970be6a05c1ccbadbcece0c6db9b3882"
+assert "dev assertionspec exists" {
+  kind = "exists"
+  file_path = "~/dev.hcl"
+  or {
+    action = "APPLY"
+    source_path = "dev.hcl"
+    destination_path = "~/dev.hcl"
+  }
 }

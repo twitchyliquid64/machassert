@@ -50,7 +50,7 @@ func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionRes
 		result, err = applyExistsAssertion(machine, assertion)
 	}
 
-	if err == nil && result.Result == AssertionApplied {
+	if err == nil && result.Result == AssertionApplied { //apply the actions
 		for _, action := range assertion.Actions {
 			err = doAction(machine, assertion, action)
 			if err == ErrAssertionsFailed {
