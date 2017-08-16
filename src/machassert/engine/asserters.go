@@ -72,7 +72,7 @@ func doAction(machine Machine, assertion *config.Assertion, action *config.Actio
 	case "FAIL":
 		return ErrAssertionsFailed
 	default:
-		return errors.New("Unrecognised actions kind")
+		return errors.New("Unrecognised actions kind: " + action.Kind)
 	}
 }
 

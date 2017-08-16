@@ -13,7 +13,7 @@ assert "check echo" {
 assert "dev assertionspec exists" {
   kind = "exists"
   file_path = "~/dev.hcl"
-  or {
+  or "apply files" {
     action = "APPLY"
     source_path = "dev.hcl"
     destination_path = "~/dev.hcl"

@@ -2,16 +2,25 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/ast"
 )
 
 // ParseAssertionsSchema takes a target configuration and translates it into in-memory structures.
 func ParseAssertionsSchema(data []byte) (*AssertionSpec, error) {
+	fmt.Println(string(data))
 	astRoot, err := hcl.ParseBytes(data)
 	if err != nil {
 		return nil, err
+	}
+	fmt.Println(spew.Sdump(astRoot))
+
+	if _, ok := astRoot.Node.(*ast.ObjectList); !ok {
+		return nil, errors.New("schema malformed")
 	}
 
 	var outSpec AssertionSpec
@@ -20,12 +29,11 @@ func ParseAssertionsSchema(data []byte) (*AssertionSpec, error) {
 		return nil, err
 	}
 
+	normaliseAssertionSpec(&outSpec)
 	err = checkAssertionSpec(&outSpec)
 	if err != nil {
 		return nil, err
 	}
-
-	normaliseAssertionSpec(&outSpec)
 	return &outSpec, nil
 }
 
@@ -41,8 +49,18 @@ func ParseAssertionsSpecFile(fpath string) (*AssertionSpec, error) {
 
 func normaliseAssertionSpec(spec *AssertionSpec) {
 	for i := range spec.Assertions {
-		if len(spec.Assertions[i].Actions) == 0 {
-			spec.Assertions[i].Actions = []*Action{&Action{Kind: ActionFail}}
+		normaliseAssertion(spec.Assertions[i])
+	}
+}
+
+func normaliseAssertion(assertion *Assertion) {
+	if len(assertion.Actions) == 0 {
+		assertion.Actions = []*Action{&Action{Kind: ActionFail}}
+	} else {
+		for x := range assertion.Actions {
+			if assertion.Actions[x].Kind == "" {
+				assertion.Actions[x].Kind = ActionFail
+			}
 		}
 	}
 }
@@ -60,7 +78,7 @@ func checkAssertion(a *Assertion) error {
 			return errors.New("hash/file_path must be specified for md5_match assertions")
 		}
 	default:
-		return errors.New("unsupported assertion type/kind")
+		return errors.New("unsupported assertion type/kind: " + a.Kind)
 	}
 
 	for _, action := range a.Actions {
@@ -71,7 +89,7 @@ func checkAssertion(a *Assertion) error {
 				return errors.New("source_path/destination_path must be specified for APPLY actions")
 			}
 		default:
-			return errors.New("unsupported action type/kind")
+			return errors.New("unsupported action type/kind: " + action.Kind)
 		}
 	}
 	return nil

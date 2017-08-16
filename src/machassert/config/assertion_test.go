@@ -46,7 +46,7 @@ func TestSimpleAssertionErrors(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	if err.Error() != "unsupported assertion type/kind" {
-		t.Errorf("Got %q, Want 'unsupported assertion type/kind'", err)
+	if err.Error() != "unsupported assertion type/kind: welperino" {
+		t.Errorf("Got %q, Want 'unsupported assertion type/kind: welperino'", err)
 	}
 }
