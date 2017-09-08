@@ -2,22 +2,18 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
 // ParseAssertionsSchema takes a target configuration and translates it into in-memory structures.
 func ParseAssertionsSchema(data []byte) (*AssertionSpec, error) {
-	fmt.Println(string(data))
 	astRoot, err := hcl.ParseBytes(data)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(spew.Sdump(astRoot))
 
 	if _, ok := astRoot.Node.(*ast.ObjectList); !ok {
 		return nil, errors.New("schema malformed")
@@ -84,7 +80,7 @@ func checkAssertion(a *Assertion) error {
 	for _, action := range a.Actions {
 		switch action.Kind {
 		case ActionFail:
-		case ActionApplyFile:
+		case ActionCopyFile:
 			if action.SourcePath == "" || action.DestinationPath == "" {
 				return errors.New("source_path/destination_path must be specified for APPLY actions")
 			}

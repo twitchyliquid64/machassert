@@ -77,6 +77,7 @@ func main() {
 	case "run":
 		fallthrough
 	case "assert":
+		fmt.Println("\n")
 		e := engine.New(targets, assertions)
 		err = e.Run()
 		if err != nil && err == engine.ErrAssertionsFailed {

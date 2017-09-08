@@ -65,17 +65,6 @@ func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionRes
 	return result, err
 }
 
-func doAction(machine Machine, assertion *config.Assertion, action *config.Action) error {
-	switch action.Kind {
-	case "":
-		return nil
-	case "FAIL":
-		return ErrAssertionsFailed
-	default:
-		return errors.New("Unrecognised actions kind: " + action.Kind)
-	}
-}
-
 func applyExistsAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
 	f, err := machine.ReadFile(assertion.FilePath)
 	if err != nil && os.IsNotExist(err) {

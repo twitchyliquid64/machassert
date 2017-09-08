@@ -14,7 +14,7 @@ assert "dev assertionspec exists" {
   kind = "exists"
   file_path = "~/dev.hcl"
   or "apply files" {
-    action = "APPLY"
+    action = "COPY"
     source_path = "dev.hcl"
     destination_path = "~/dev.hcl"
   }
