@@ -91,6 +91,9 @@ func (l *ConsoleLogger) paint() {
 				l.printf(Yellow(assertionInfo.result.String()))
 			} else {
 				l.printf(Red(assertionInfo.result.String()))
+				if assertionInfo.err != nil {
+					l.printf(" (%v)", assertionInfo.err)
+				}
 			}
 		}
 

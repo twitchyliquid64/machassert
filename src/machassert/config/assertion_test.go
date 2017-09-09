@@ -50,3 +50,43 @@ func TestSimpleAssertionErrors(t *testing.T) {
 		t.Errorf("Got %q, Want 'unsupported assertion type/kind: welperino'", err)
 	}
 }
+
+func TestBadMatchFileAssertionErrors(t *testing.T) {
+	_, err := ParseAssertionsSpecFile("testdata/assertions/badMatchFile.hcl")
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "base_path/file_path must be specified for file_match assertions" {
+		t.Errorf("Got %q, Want 'base_path/file_path must be specified for file_match assertions'", err)
+	}
+}
+
+func TestBadHashMatchAssertionErrors(t *testing.T) {
+	_, err := ParseAssertionsSpecFile("testdata/assertions/badHashMatch.hcl")
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "hash/file_path must be specified for md5_match assertions" {
+		t.Errorf("Got %q, Want 'hash/file_path must be specified for md5_match assertions'", err)
+	}
+}
+
+func TestBadFileExistsAssertionErrors(t *testing.T) {
+	_, err := ParseAssertionsSpecFile("testdata/assertions/badFileExists.hcl")
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "file_path must be specified for exists and !exists assertions" {
+		t.Errorf("Got %q, Want 'file_path must be specified for exists and !exists assertions'", err)
+	}
+}
+
+func TestBadCopyActionErrors(t *testing.T) {
+	_, err := ParseAssertionsSpecFile("testdata/actions/badCopy.hcl")
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "source_path/destination_path must be specified for COPY actions" {
+		t.Errorf("Got %q, Want 'source_path/destination_path must be specified for COPY actions'", err)
+	}
+}

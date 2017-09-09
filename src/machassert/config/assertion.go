@@ -5,6 +5,7 @@ const (
 	FileExistsAssrt    string = "exists"
 	FileNotExistsAssrt string = "!exists"
 	HashMatchAssrt     string = "md5_match"
+	HashFileAssrt      string = "file_match"
 )
 
 // Action kinds
@@ -23,10 +24,13 @@ type AssertionSpec struct {
 type Assertion struct {
 	Kind string
 
-	// FileExistsAssrt & FileNotExistsAssrt
+	// FileExistsAssrt & FileNotExistsAssrt & HashMatchAssrt
 	FilePath string `hcl:"file_path"`
 	// HashMatchAssrt
 	Hash string //hex-encoded hash bytes
+
+	// HashFileAssrt
+	BasePath string `hcl:"base_path"`
 
 	Actions []*Action `hcl:"or"`
 }

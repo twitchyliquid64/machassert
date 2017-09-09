@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"machassert/config"
+	"machassert/util"
 	"os"
 )
 
@@ -21,17 +22,17 @@ func doAction(machine Machine, assertion *config.Assertion, action *config.Actio
 }
 
 func copyAction(machine Machine, assertion *config.Assertion, action *config.Action) error {
-	input, err := os.Open(action.SourcePath)
-	if err != nil {
-		return err
-	}
-	defer input.Close()
-
 	output, err := machine.WriteFile(action.DestinationPath)
 	if err != nil {
 		return err
 	}
 	defer output.Close()
+
+	input, err := os.Open(util.PathSanitize(action.SourcePath))
+	if err != nil {
+		return err
+	}
+	defer input.Close()
 
 	_, err = io.Copy(output, input)
 	return err

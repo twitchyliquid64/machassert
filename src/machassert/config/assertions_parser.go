@@ -73,6 +73,10 @@ func checkAssertion(a *Assertion) error {
 		if a.Hash == "" || a.FilePath == "" {
 			return errors.New("hash/file_path must be specified for md5_match assertions")
 		}
+	case HashFileAssrt:
+		if a.BasePath == "" || a.FilePath == "" {
+			return errors.New("base_path/file_path must be specified for file_match assertions")
+		}
 	default:
 		return errors.New("unsupported assertion type/kind: " + a.Kind)
 	}
@@ -82,7 +86,7 @@ func checkAssertion(a *Assertion) error {
 		case ActionFail:
 		case ActionCopyFile:
 			if action.SourcePath == "" || action.DestinationPath == "" {
-				return errors.New("source_path/destination_path must be specified for APPLY actions")
+				return errors.New("source_path/destination_path must be specified for COPY actions")
 			}
 		default:
 			return errors.New("unsupported action type/kind: " + action.Kind)

@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"io"
+	"machassert/util"
 	"os"
 	"os/exec"
-	"path"
 	"runtime"
 	"strings"
 )
@@ -38,8 +38,14 @@ func (m *Local) Run(name string, args []string) ([]byte, error) {
 // Hash returns the MD5 hash of the file at the given path.
 func (m *Local) Hash(fpath string) ([]byte, error) {
 	switch runtime.GOOS {
+	case "linux":
+		o, err := m.Run("md5sum", []string{util.PathSanitize(fpath)})
+		if err != nil {
+			return nil, err
+		}
+		return hex.DecodeString(string(o[:32]))
 	case "darwin":
-		o, err := m.Run("md5", []string{"-q", pathSanitize(fpath)})
+		o, err := m.Run("md5", []string{"-q", util.PathSanitize(fpath)})
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +58,7 @@ func (m *Local) Hash(fpath string) ([]byte, error) {
 
 // ReadFile returns a reader to a file on a local machine.
 func (m *Local) ReadFile(fpath string) (io.ReadCloser, error) {
-	return os.Open(pathSanitize(fpath))
+	return os.Open(util.PathSanitize(fpath))
 }
 
 // Close releases the resources associated with the machine.
@@ -60,14 +66,7 @@ func (m *Local) Close() error {
 	return nil
 }
 
-func pathSanitize(in string) string {
-	if len(in) > 0 && in[0] == '~' {
-		return path.Join(os.Getenv("HOME"), in[2:])
-	}
-	return in
-}
-
 // WriteFile returns a writer which can be used to write content to the remote file.
 func (m *Local) WriteFile(fpath string) (io.WriteCloser, error) {
-	return os.OpenFile(pathSanitize(fpath), os.O_RDWR|os.O_CREATE, 0755)
+	return os.OpenFile(util.PathSanitize(fpath), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 }

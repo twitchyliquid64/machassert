@@ -10,9 +10,10 @@ assert "check echo" {
   file_path = "/bin/echo"
 }
 
-assert "dev assertionspec exists" {
-  kind = "exists"
+assert "dev assertionspec latest" {
+  kind = "file_match"
   file_path = "~/dev.hcl"
+  base_path = "dev.hcl"
   or "apply files" {
     action = "COPY"
     source_path = "dev.hcl"
