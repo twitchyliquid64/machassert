@@ -2,7 +2,7 @@
 
 Assertions for system administrators. Puppet but easy to understand, and without the nonsense.
 
-You write assertions which tell machassert to check files exist/packages installed/process running/etc. You write actions which occur when an assertion fails: Copy this file, install this package etc. By combining these two features, you get a scriptable, easy to understand means to deploy software across a fleet.
+You write assertions to check files-exist/packages-installed/process-running/etc. You write actions which occur when an assertion fails: Copy this file, install this package etc. By combining these two features, you get a scriptable, easy to understand means to deploy software across a fleet.
 
 ## How to use
 
@@ -23,7 +23,7 @@ assert "fisher installed" {
   file_path = "/bin/fisher"
 }
 
-assert "thing" {
+assert "fisher default config" {
   kind = "exists"
   file_path = "~/.fisher/defaults.hcl"
   or {
