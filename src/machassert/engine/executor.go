@@ -53,9 +53,9 @@ type assertionForSort struct {
 	assertion *config.Assertion
 }
 
-func sortAssertions(assertions *config.AssertionSpec) []string {
+func sortAssertions(assertions map[string]*config.Assertion) []string {
 	var out []assertionForSort
-	for k, v := range assertions.Assertions {
+	for k, v := range assertions {
 		out = append(out, assertionForSort{k, v})
 	}
 	bo := ByOrder(out)
@@ -84,10 +84,10 @@ func (a ByOrder) keys() []string {
 }
 
 func (e *Executor) runAssertionOnMachine(machine Machine, assertions *config.AssertionSpec) error {
-	for _, assertionName := range sortAssertions(assertions) {
+	for _, assertionName := range sortAssertions(assertions.Assertions) {
 		assertion := assertions.Assertions[assertionName]
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, nil, nil)
-		result, err := applyAssertion(machine, assertion)
+		result, err := applyAssertion(machine, assertion, e)
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, result, err)
 		if err != nil {
 			return err

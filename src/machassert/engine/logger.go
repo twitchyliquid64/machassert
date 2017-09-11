@@ -115,8 +115,12 @@ func (l *ConsoleLogger) LogAssertionStatus(specName, assertionName string, asser
 			specName:  specName,
 		})
 	} else {
-		l.assertionInfo[len(l.assertionInfo)-1].result = assertionResult
-		l.assertionInfo[len(l.assertionInfo)-1].err = err
+		for i := range l.assertionInfo {
+			if l.assertionInfo[i].assertion == assertion {
+				l.assertionInfo[i].result = assertionResult
+				l.assertionInfo[i].err = err
+			}
+		}
 	}
 	l.paint()
 }

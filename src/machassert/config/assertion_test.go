@@ -93,3 +93,14 @@ func TestBadCopyActionErrors(t *testing.T) {
 		t.Errorf("Got %q, Want 'source_path/destination_path must be specified for COPY actions'", err)
 	}
 }
+
+func TestBadAssertActionErrors(t *testing.T) {
+	a, err := ParseAssertionsSpecFile("testdata/actions/badAssertAction.hcl")
+	if err == nil {
+		t.Log(spew.Sdump(a))
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "at least one assertion must exist for ASSERT actions" {
+		t.Errorf("Got %q, Want 'at least one assertion must exist for ASSERT actions'", err)
+	}
+}

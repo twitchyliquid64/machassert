@@ -23,3 +23,17 @@ assert "dev assertionspec latest" {
     destination_path = "~/dev.hcl"
   }
 }
+
+assert "check other" {
+  kind = "exists"
+  order = 1
+  file_path = "/bin/yelp"
+  or "double check" {
+    action = "ASSERT"
+
+    assert "check echo 2" {
+      kind = "exists"
+      file_path = "/bin/echo"
+    }
+  }
+}

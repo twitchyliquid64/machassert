@@ -59,6 +59,10 @@ func normaliseAssertion(assertion *Assertion) {
 		for x := range assertion.Actions {
 			if assertion.Actions[x].Kind == "" {
 				assertion.Actions[x].Kind = ActionFail
+			} else if assertion.Actions[x].Kind == ActionAssert {
+				for _, assertion := range assertion.Actions[x].Assertions {
+					normaliseAssertion(assertion)
+				}
 			}
 		}
 	}
@@ -87,6 +91,10 @@ func checkAssertion(a *Assertion) error {
 	for _, action := range a.Actions {
 		switch action.Kind {
 		case ActionFail:
+		case ActionAssert:
+			if len(action.Assertions) == 0 {
+				return errors.New("at least one assertion must exist for ASSERT actions")
+			}
 		case ActionCopyFile:
 			if action.SourcePath == "" || action.DestinationPath == "" {
 				return errors.New("source_path/destination_path must be specified for COPY actions")

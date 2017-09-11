@@ -45,7 +45,7 @@ func (r AssertionResult) String() string {
 	}
 }
 
-func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
+func applyAssertion(machine Machine, assertion *config.Assertion, e *Executor) (*AssertionResult, error) {
 	result := &AssertionResult{Result: AssertionError}
 	var err error
 
@@ -62,7 +62,7 @@ func applyAssertion(machine Machine, assertion *config.Assertion) (*AssertionRes
 
 	if err == nil && result.Result == AssertionApplied { //apply the actions
 		for _, action := range assertion.Actions {
-			err = doAction(machine, assertion, action)
+			err = doAction(machine, assertion, action, e)
 			if err == ErrAssertionsFailed {
 				result.Result = AssertionFailed
 			}
