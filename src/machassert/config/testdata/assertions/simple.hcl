@@ -2,6 +2,7 @@ name = "frontend"
 
 assert "binary" {
   kind = "exists"
+  order = 1
   file_path = "/bin/ls"
 }
 

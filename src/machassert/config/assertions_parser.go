@@ -46,6 +46,9 @@ func ParseAssertionsSpecFile(fpath string) (*AssertionSpec, error) {
 func normaliseAssertionSpec(spec *AssertionSpec) {
 	for i := range spec.Assertions {
 		normaliseAssertion(spec.Assertions[i])
+		if spec.Assertions[i].Order == 0 {
+			spec.Assertions[i].Order = 1000
+		}
 	}
 }
 

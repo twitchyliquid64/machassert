@@ -23,8 +23,8 @@ func TestSimpleAssertionParse(t *testing.T) {
 		t.Fatal("No assertion 'binary'")
 	}
 	a1 := spec.Assertions["binary"]
-	if a1.Kind != FileExistsAssrt || a1.FilePath != "/bin/ls" {
-		t.Errorf("Got %q, wanted {Kind:'exists', FilePath:'/bin/ls'}", spew.Sdump(a1))
+	if a1.Kind != FileExistsAssrt || a1.FilePath != "/bin/ls" || a1.Order != 1 {
+		t.Errorf("Got %q, wanted {Kind:'exists', FilePath:'/bin/ls', Order: 1}", spew.Sdump(a1))
 	}
 
 	if len(a1.Actions) != 1 {
@@ -38,6 +38,9 @@ func TestSimpleAssertionParse(t *testing.T) {
 		t.Fatal("No assertion 'thing'")
 	}
 	a2 := spec.Assertions["thing"]
+	if a2.Order != 1000 {
+		t.Error("Expected default order '1000'")
+	}
 	t.Log(spew.Sdump(a2))
 }
 

@@ -22,7 +22,8 @@ type AssertionSpec struct {
 
 // Assertion describes the schema for a assertion.
 type Assertion struct {
-	Kind string
+	Kind  string
+	Order int
 
 	// FileExistsAssrt & FileNotExistsAssrt & HashMatchAssrt
 	FilePath string `hcl:"file_path"`

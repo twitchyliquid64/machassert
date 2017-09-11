@@ -4,6 +4,7 @@ import (
 	"errors"
 	"machassert/config"
 	"machassert/machine"
+	"sort"
 )
 
 // Executor stores state/configuration for applying assertions to targets.
@@ -47,8 +48,44 @@ func (e *Executor) Run() error {
 	return nil
 }
 
+type assertionForSort struct {
+	name      string
+	assertion *config.Assertion
+}
+
+func sortAssertions(assertions *config.AssertionSpec) []string {
+	var out []assertionForSort
+	for k, v := range assertions.Assertions {
+		out = append(out, assertionForSort{k, v})
+	}
+	bo := ByOrder(out)
+	sort.Sort(bo)
+	return bo.keys()
+}
+
+// ByOrder implements sort.Interface for []assertionsForSort based on
+// the Order field.
+type ByOrder []assertionForSort
+
+func (a ByOrder) Len() int      { return len(a) }
+func (a ByOrder) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByOrder) Less(i, j int) bool {
+	if a[i].assertion.Order == a[j].assertion.Order {
+		return a[i].name < a[j].name
+	}
+	return a[i].assertion.Order < a[j].assertion.Order
+}
+func (a ByOrder) keys() []string {
+	out := make([]string, len(a))
+	for i := range a {
+		out[i] = a[i].name
+	}
+	return out
+}
+
 func (e *Executor) runAssertionOnMachine(machine Machine, assertions *config.AssertionSpec) error {
-	for assertionName, assertion := range assertions.Assertions {
+	for _, assertionName := range sortAssertions(assertions) {
+		assertion := assertions.Assertions[assertionName]
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, nil, nil)
 		result, err := applyAssertion(machine, assertion)
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, result, err)
