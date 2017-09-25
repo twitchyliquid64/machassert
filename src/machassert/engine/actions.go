@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func doAction(machine Machine, assertion *config.Assertion, action *config.Action, e *Executor) error {
+func doAction(machine Machine, assertion *config.Assertion, action *config.Action, e *Executor, printPrefix string) error {
 	switch action.Kind {
 	case "":
 		return nil
@@ -17,18 +17,18 @@ func doAction(machine Machine, assertion *config.Assertion, action *config.Actio
 	case config.ActionCopyFile:
 		return copyAction(machine, assertion, action)
 	case config.ActionAssert:
-		return assertAction(machine, assertion, action, e)
+		return assertAction(machine, assertion, action, e, printPrefix)
 	default:
 		return errors.New("Unrecognised actions kind: " + action.Kind)
 	}
 }
 
-func assertAction(machine Machine, assertion *config.Assertion, action *config.Action, e *Executor) error {
+func assertAction(machine Machine, assertion *config.Assertion, action *config.Action, e *Executor, printPrefix string) error {
 	for _, assertionName := range sortAssertions(action.Assertions) {
 		assertion := action.Assertions[assertionName]
-		e.logger.LogAssertionStatus("\t", assertionName, assertion, nil, nil)
-		result, err := applyAssertion(machine, assertion, e)
-		e.logger.LogAssertionStatus("\t", assertionName, assertion, result, err)
+		e.logger.LogAssertionStatus(printPrefix, assertionName, assertion, nil, nil)
+		result, err := applyAssertion(machine, assertion, e, printPrefix+"."+assertionName)
+		e.logger.LogAssertionStatus(printPrefix, assertionName, assertion, result, err)
 		if err != nil {
 			return err
 		}

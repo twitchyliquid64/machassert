@@ -13,6 +13,7 @@ type Logger interface {
 	LogAssertionStatus(string, string, *config.Assertion, *AssertionResult, error)
 }
 
+// ConsoleLogger implementes the Logger interface by pretty-printing to the terminal.
 type ConsoleLogger struct {
 	machines       map[string]machineStatus
 	assertionInfo  []*assertionInfo
@@ -35,6 +36,7 @@ type assertionInfo struct {
 	err       error
 }
 
+// LogMachineStatus is called when a machine's (being asserted against) status changes.
 func (l *ConsoleLogger) LogMachineStatus(name string, isConnected bool, m *config.Machine, err error) {
 	if l.machines == nil {
 		l.machines = make(map[string]machineStatus)
@@ -105,6 +107,7 @@ func (l *ConsoleLogger) paint() {
 
 }
 
+// LogAssertionStatus is called with assertion information when an assertion changes status.
 func (l *ConsoleLogger) LogAssertionStatus(specName, assertionName string, assertion *config.Assertion,
 	assertionResult *AssertionResult, err error) {
 	if assertionResult == nil {

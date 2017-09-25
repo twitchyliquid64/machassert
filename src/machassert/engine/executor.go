@@ -87,7 +87,7 @@ func (e *Executor) runAssertionOnMachine(machine Machine, assertions *config.Ass
 	for _, assertionName := range sortAssertions(assertions.Assertions) {
 		assertion := assertions.Assertions[assertionName]
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, nil, nil)
-		result, err := applyAssertion(machine, assertion, e)
+		result, err := applyAssertion(machine, assertion, e, assertions.Name+"."+assertionName)
 		e.logger.LogAssertionStatus(assertions.Name, assertionName, assertion, result, err)
 		if err != nil {
 			return err

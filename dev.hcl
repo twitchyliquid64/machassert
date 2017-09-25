@@ -33,7 +33,16 @@ assert "check other" {
 
     assert "check echo 2" {
       kind = "exists"
-      file_path = "/bin/echo"
+      file_path = "/bin/echso"
+
+      or "double check" {
+        action = "ASSERT"
+
+        assert "check echo 3" {
+          kind = "exists"
+          file_path = "/bin/echo"
+        }
+      }
     }
   }
 }
