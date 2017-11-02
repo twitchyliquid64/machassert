@@ -114,6 +114,18 @@ func (r *Remote) Hash(fpath string) ([]byte, error) {
 	return hex.DecodeString(hashStr)
 }
 
+// Grep returns true if the a line in a file match some regular expression.
+func (r *Remote) Grep(fpath, regex string) (bool, error) {
+	_, err := r.Run("grep", []string{"-q", "-E", regex, fpath})
+	if err != nil {
+		if _, nonZeroExitStatus := err.(*ssh.ExitError); nonZeroExitStatus {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 // Name returns the name of the target
 func (r *Remote) Name() string {
 	return r.MachineName

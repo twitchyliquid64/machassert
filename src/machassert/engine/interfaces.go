@@ -9,6 +9,7 @@ type Machine interface {
 	Name() string
 	ReadFile(fpath string) (io.ReadCloser, error)
 	WriteFile(fpath string) (io.WriteCloser, error)
+	Grep(fpath, regex string) (bool, error)
 	Hash(fpath string) ([]byte, error)
 	Close() error
 }

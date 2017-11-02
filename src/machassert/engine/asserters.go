@@ -54,8 +54,12 @@ func applyAssertion(machine Machine, assertion *config.Assertion, e *Executor, p
 		result, err = applyHashAssertion(machine, assertion)
 	case config.FileExistsAssrt:
 		result, err = applyExistsAssertion(machine, assertion)
+	case config.FileNotExistsAssrt:
+		result, err = applyNotExistsAssertion(machine, assertion)
 	case config.HashFileAssrt:
 		result, err = applyHashFileMatchAssertion(machine, assertion)
+	case config.RegexMatchAssrt:
+		result, err = applyRegexContentsAssertion(machine, assertion)
 	default:
 		err = errors.New("unknown assertion kind: " + assertion.Kind)
 	}
@@ -88,12 +92,35 @@ func applyExistsAssertion(machine Machine, assertion *config.Assertion) (*Assert
 	return &AssertionResult{Result: AssertionNoop}, nil
 }
 
+func applyNotExistsAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
+	f, err := machine.ReadFile(assertion.FilePath)
+	if err != nil && os.IsNotExist(err) {
+		return &AssertionResult{Result: AssertionNoop}, nil
+	}
+	if err != nil {
+		return &AssertionResult{Result: AssertionError}, err
+	}
+	f.Close()
+	return &AssertionResult{Result: AssertionApplied}, nil
+}
+
 func applyHashAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
 	hash, err := machine.Hash(assertion.FilePath)
 	if err != nil {
 		return &AssertionResult{Result: AssertionError}, err
 	}
 	if hex.EncodeToString(hash) != strings.ToLower(assertion.Hash) {
+		return &AssertionResult{Result: AssertionApplied}, nil
+	}
+	return &AssertionResult{Result: AssertionNoop}, nil
+}
+
+func applyRegexContentsAssertion(machine Machine, assertion *config.Assertion) (*AssertionResult, error) {
+	matched, err := machine.Grep(assertion.FilePath, assertion.Regex)
+	if err != nil {
+		return &AssertionResult{Result: AssertionError}, err
+	}
+	if !matched {
 		return &AssertionResult{Result: AssertionApplied}, nil
 	}
 	return &AssertionResult{Result: AssertionNoop}, nil

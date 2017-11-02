@@ -104,3 +104,14 @@ func TestBadAssertActionErrors(t *testing.T) {
 		t.Errorf("Got %q, Want 'at least one assertion must exist for ASSERT actions'", err)
 	}
 }
+
+func TestBadRegexContentMatchAssertionErrors(t *testing.T) {
+	a, err := ParseAssertionsSpecFile("testdata/assertions/badRegexContentsMatch.hcl")
+	if err == nil {
+		t.Log(spew.Sdump(a))
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "regex must be specified for regex_contents_match assertions" {
+		t.Errorf("Got %q, Want 'regex must be specified for regex_contents_match assertions'", err)
+	}
+}

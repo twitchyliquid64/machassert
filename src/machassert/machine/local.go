@@ -56,6 +56,18 @@ func (m *Local) Hash(fpath string) ([]byte, error) {
 	}
 }
 
+// Grep returns true if the a line in a file match some regular expression.
+func (m *Local) Grep(fpath, regex string) (bool, error) {
+	_, err := m.Run("grep", []string{"-q", "-E", regex, util.PathSanitize(fpath)})
+	if err != nil {
+		if _, nonZeroExitStatus := err.(*exec.ExitError); nonZeroExitStatus {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 // ReadFile returns a reader to a file on a local machine.
 func (m *Local) ReadFile(fpath string) (io.ReadCloser, error) {
 	return os.Open(util.PathSanitize(fpath))

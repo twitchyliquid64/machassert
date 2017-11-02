@@ -6,6 +6,12 @@ assert "check ls" {
   file_path = "/bin/ls"
 }
 
+assert "check missing works" {
+  kind = "!exists"
+  order = 4
+  file_path = "/bin/kekkening"
+}
+
 assert "check echo" {
   kind = "exists"
   order = 1
@@ -22,6 +28,14 @@ assert "dev assertionspec latest" {
     source_path = "dev.hcl"
     destination_path = "~/dev.hcl"
   }
+}
+
+
+assert "regex test" {
+  kind = "regex_contents_match"
+  file_path = "~/dev.hcl"
+  regex = "assert"
+  order = -1
 }
 
 assert "check other" {

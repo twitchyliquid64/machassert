@@ -84,6 +84,10 @@ func checkAssertion(a *Assertion) error {
 		if a.BasePath == "" || a.FilePath == "" {
 			return errors.New("base_path/file_path must be specified for file_match assertions")
 		}
+	case RegexMatchAssrt:
+		if a.Regex == "" {
+			return errors.New("regex must be specified for regex_contents_match assertions")
+		}
 	default:
 		return errors.New("unsupported assertion type/kind: " + a.Kind)
 	}

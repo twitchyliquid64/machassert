@@ -6,6 +6,7 @@ const (
 	FileNotExistsAssrt string = "!exists"
 	HashMatchAssrt     string = "md5_match"
 	HashFileAssrt      string = "file_match"
+	RegexMatchAssrt    string = "regex_contents_match"
 )
 
 // Action kinds
@@ -33,6 +34,9 @@ type Assertion struct {
 
 	// HashFileAssrt
 	BasePath string `hcl:"base_path"`
+
+	// RegexMatchAssrt
+	Regex string `hcl:"regex"`
 
 	Actions []*Action `hcl:"or"`
 }
