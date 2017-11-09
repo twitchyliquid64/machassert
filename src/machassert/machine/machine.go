@@ -4,6 +4,7 @@ import "machassert/config"
 
 type authPromptProvider interface {
 	AuthenticationPrompt(prompt string) (string, error)
+	KeyboardInteractiveAuth(user, instruction string, questions []string, echos []bool) ([]string, error)
 }
 
 // SSH represents an assertion target which is communicated with over SSH.

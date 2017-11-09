@@ -13,7 +13,10 @@ import (
 type Logger interface {
 	LogMachineStatus(string, bool, *config.Machine, error)
 	LogAssertionStatus(string, string, *config.Assertion, *AssertionResult, error)
-	AuthenticationPrompt(prompt string) (string, error) // called by the machine if a password is required and prompt = auth
+	// AuthenticationPrompt is called by the machine if a password is required and auth.Kind = prompt
+	AuthenticationPrompt(prompt string) (string, error)
+	// KeyboardInteractiveAuth is called by the machine if prompts recieved and auth.Kind = prompt
+	KeyboardInteractiveAuth(user, instruction string, questions []string, echos []bool) ([]string, error)
 }
 
 // ConsoleLogger implementes the Logger interface by pretty-printing to the terminal.
@@ -22,6 +25,8 @@ type ConsoleLogger struct {
 	assertionInfo  []*assertionInfo
 	currentMachine string
 	linesPrinted   int
+
+	haveDoneInteractivePrompt bool
 }
 
 type machineStatus struct {
@@ -39,9 +44,30 @@ type assertionInfo struct {
 	err       error
 }
 
+// KeyboardInteractiveAuth is called by a machine object if authKind = 'prompt', and a keyboard interactive authentication session is initiated by the server.
+func (l *ConsoleLogger) KeyboardInteractiveAuth(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
+	if instruction != "" {
+		l.printf("\n%s (%s)", instruction, user)
+	}
+	for i := range questions {
+		if i == 0 && !l.haveDoneInteractivePrompt {
+			l.printf("\n")
+			l.haveDoneInteractivePrompt = true
+		}
+		l.printf("\t%s", questions[i])
+		r, err := gopass.GetPasswd()
+		l.linesPrinted++
+		if err != nil {
+			return nil, err
+		}
+		answers = append(answers, string(r))
+	}
+	return
+}
+
 // AuthenticationPrompt is called by a machine object if authKind = 'prompt', and a password is required.
 func (l *ConsoleLogger) AuthenticationPrompt(prompt string) (string, error) {
-	l.printf("\nPassword: ")
+	l.printf("\n%s", prompt)
 	pw, err := gopass.GetPasswd()
 	l.linesPrinted++
 	return string(pw), err

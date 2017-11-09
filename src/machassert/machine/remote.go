@@ -27,6 +27,7 @@ func ConnectRemote(name string, m *config.Machine, auther authPromptProvider) (*
 		case config.AuthKindPassword:
 			c.Auth = append(c.Auth, ssh.Password(authItem.Password))
 		case config.AuthKindPrompt:
+			c.Auth = append(c.Auth, ssh.KeyboardInteractive(auther.KeyboardInteractiveAuth))
 			c.Auth = append(c.Auth, ssh.PasswordCallback(func() (string, error) {
 				return auther.AuthenticationPrompt("Password: ")
 			}))
