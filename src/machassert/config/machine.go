@@ -9,6 +9,7 @@ const (
 // Valid authentication means/types
 const (
 	AuthKindPassword = "password"
+	AuthKindPrompt   = "prompt"
 )
 
 // MachineSpec describes the high-level schema for target configuration.

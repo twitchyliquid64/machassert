@@ -5,12 +5,15 @@ import (
 	"machassert/config"
 	"strconv"
 	"strings"
+
+	"github.com/howeyc/gopass"
 )
 
 // Logger is how the status of assertions and runs are communicated.
 type Logger interface {
 	LogMachineStatus(string, bool, *config.Machine, error)
 	LogAssertionStatus(string, string, *config.Assertion, *AssertionResult, error)
+	AuthenticationPrompt(prompt string) (string, error) // called by the machine if a password is required and prompt = auth
 }
 
 // ConsoleLogger implementes the Logger interface by pretty-printing to the terminal.
@@ -34,6 +37,14 @@ type assertionInfo struct {
 	assertion *config.Assertion
 	result    *AssertionResult
 	err       error
+}
+
+// AuthenticationPrompt is called by a machine object if authKind = 'prompt', and a password is required.
+func (l *ConsoleLogger) AuthenticationPrompt(prompt string) (string, error) {
+	l.printf("\nPassword: ")
+	pw, err := gopass.GetPasswd()
+	l.linesPrinted++
+	return string(pw), err
 }
 
 // LogMachineStatus is called when a machine's (being asserted against) status changes.

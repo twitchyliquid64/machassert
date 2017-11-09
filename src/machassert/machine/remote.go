@@ -20,12 +20,16 @@ type Remote struct {
 }
 
 // ConnectRemote opens an SSH connection to a remote target.
-func ConnectRemote(name string, m *config.Machine) (*Remote, error) {
+func ConnectRemote(name string, m *config.Machine, auther authPromptProvider) (*Remote, error) {
 	c := &ssh.ClientConfig{User: m.Username, HostKeyCallback: ssh.InsecureIgnoreHostKey()}
 	for _, authItem := range m.Auth {
 		switch authItem.Kind {
 		case config.AuthKindPassword:
 			c.Auth = append(c.Auth, ssh.Password(authItem.Password))
+		case config.AuthKindPrompt:
+			c.Auth = append(c.Auth, ssh.PasswordCallback(func() (string, error) {
+				return auther.AuthenticationPrompt("Password: ")
+			}))
 		}
 	}
 

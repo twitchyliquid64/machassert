@@ -27,7 +27,7 @@ func New(machines *config.MachineSpec, assertions []*config.AssertionSpec) *Exec
 func (e *Executor) Run() error {
 	for name, machine := range e.machines.Machine {
 		e.logger.LogMachineStatus(name, false, machine, nil)
-		m, err := connect(name, machine)
+		m, err := connect(name, machine, e.logger)
 		e.logger.LogMachineStatus(name, true, machine, err)
 		if err != nil {
 			return err
@@ -96,12 +96,12 @@ func (e *Executor) runAssertionOnMachine(machine Machine, assertions *config.Ass
 	return nil
 }
 
-func connect(name string, m *config.Machine) (Machine, error) {
+func connect(name string, m *config.Machine, l Logger) (Machine, error) {
 	switch m.Kind {
 	case config.KindLocal:
 		return machine.ConnectLocal(name, m)
 	case config.KindSSH:
-		return machine.ConnectRemote(name, m)
+		return machine.ConnectRemote(name, m, l)
 	}
 	return nil, errors.New("Could not interpret machine kind")
 }

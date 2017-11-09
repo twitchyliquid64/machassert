@@ -70,6 +70,7 @@ func validateMachineSpec(spec *MachineSpec) error {
 
 		for i := range spec.Machine[k].Auth {
 			switch spec.Machine[k].Auth[i].Kind {
+			case AuthKindPrompt:
 			case AuthKindPassword:
 				if spec.Machine[k].Auth[i].Password == "" {
 					return errors.New("password must be specified for password authentication")

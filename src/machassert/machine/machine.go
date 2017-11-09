@@ -2,6 +2,10 @@ package machine
 
 import "machassert/config"
 
+type authPromptProvider interface {
+	AuthenticationPrompt(prompt string) (string, error)
+}
+
 // SSH represents an assertion target which is communicated with over SSH.
 type SSH struct {
 	Destination string
