@@ -10,6 +10,8 @@ const (
 const (
 	AuthKindPassword = "password"
 	AuthKindPrompt   = "prompt"
+	AuthKindLocalKey = "user-key"
+	AuthKindKeyFile  = "key-file"
 )
 
 // MachineSpec describes the high-level schema for target configuration.
@@ -30,4 +32,5 @@ type Machine struct {
 type MachineAuth struct {
 	Kind     string
 	Password string
+	Key      string
 }

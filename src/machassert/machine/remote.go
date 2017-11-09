@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/hex"
 	"io"
+	"io/ioutil"
 	"machassert/config"
+	"machassert/util"
 	"os"
 	"strings"
 
@@ -31,6 +33,19 @@ func ConnectRemote(name string, m *config.Machine, auther authPromptProvider) (*
 			c.Auth = append(c.Auth, ssh.PasswordCallback(func() (string, error) {
 				return auther.AuthenticationPrompt("Password: ")
 			}))
+		case config.AuthKindLocalKey:
+			authItem.Key = "~/.ssh/id_rsa"
+			fallthrough
+		case config.AuthKindKeyFile:
+			key, err := ioutil.ReadFile(util.PathSanitize(authItem.Key))
+			if err != nil {
+				return nil, err
+			}
+			signer, err := ssh.ParsePrivateKey(key)
+			if err != nil {
+				return nil, err
+			}
+			c.Auth = append(c.Auth, ssh.PublicKeys(signer))
 		}
 	}
 

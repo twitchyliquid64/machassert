@@ -48,6 +48,26 @@ The above example does the following:
 1. Checks `/bin/fisher` exists on the target system. If it does not, the assertion fails and the script terminates.
 2. Checks the `~/.fisher/defaults.hcl` file exists on the target system. If it does not, the `COPY` action runs, copying the file, as well as running the assertion in the other `OR` block (which will fail if `/bin/sillyness` does not exist).
 
+#### Available assertions
+
+| Kind          | Description           | Parameters  |
+| ------------- |:----------------------| ------------|
+| exists | Fails if the path at `file_path` does not exist. | `file_path` |
+| !exists | Fails if the path at `file_path` does exists. | `file_path` |
+| md5_match | Fails if the file at `file_path` does not have an MD5 hash that matches `hash`. | `file_path`, `hash` |
+| file_match | Fails if the file at `file_path` does not match the file at `base_path`. Base path should be present on the machine from which machassert is being executed. | `file_path`, `base_path` |
+| regex_contents_match | Fails if `regex` does not match any line in `file_path`. | `regex`, `file_path` |
+
+#### Available actions
+
+Actions are run if the assertion which contains it does not hold to be true.
+
+| Action          | Description           | Additional fields required  |
+| ------------- |:----------------------| ------------|
+| FAIL | Default. Immediately fail and stop iterating through assertions. |  None. |
+| COPY | Copy a file from the local machine to the machine being asserted on. | The `OR` block must contain parameters `source_path` & `destination_path` |
+| ASSERT | Specify another set of assertions to run. | Additional named `assert` blocks must be present. |
+
 ### Target files
 
 If no target file is specified, the assertions are run on the local system.
@@ -66,27 +86,25 @@ machine "frontend-2" {
   kind = "ssh"
   destination = "10.5.32.2"
   auth {
-      password = "amazingly_secure"
+      // prompt the user for credentials
+      kind = "prompt"
+  }
+}
+machine "frontend-3" {
+  kind = "ssh"
+  destination = "10.5.32.3"
+  auth {
+      // use the current users ssh private key
+      kind = "user-key"
+  }
+}
+machine "frontend-4" {
+  kind = "ssh"
+  destination = "10.5.32.4"
+  auth {
+      // use the PEM encoded private key at /etc/secret.pem
+      kind = "key-file"
+      key = "/etc/secret.pem"
   }
 }
 ```
-
-### Available assertions
-
-| Kind          | Description           | Parameters  |
-| ------------- |:----------------------| ------------|
-| exists | Fails if the path at `file_path` does not exist. | `file_path` |
-| !exists | Fails if the path at `file_path` does exists. | `file_path` |
-| md5_match | Fails if the file at `file_path` does not have an MD5 hash that matches `hash`. | `file_path`, `hash` |
-| file_match | Fails if the file at `file_path` does not match the file at `base_path`. Base path should be present on the machine from which machassert is being executed. | `file_path`, `base_path` |
-| regex_contents_match | Fails if `regex` does not match any line in `file_path`. | `regex`, `file_path` |
-
-### Available actions
-
-Actions are run if the assertion which contains it does not hold to be true.
-
-| Action          | Description           | Additional fields required  |
-| ------------- |:----------------------| ------------|
-| FAIL | Default. Immediately fail and stop iterating through assertions. |  None. |
-| COPY | Copy a file from the local machine to the machine being asserted on. | The `OR` block must contain parameters `source_path` & `destination_path` |
-| ASSERT | Specify another set of assertions to run. | Additional named `assert` blocks must be present. |

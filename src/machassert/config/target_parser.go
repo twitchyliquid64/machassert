@@ -70,7 +70,12 @@ func validateMachineSpec(spec *MachineSpec) error {
 
 		for i := range spec.Machine[k].Auth {
 			switch spec.Machine[k].Auth[i].Kind {
+			case AuthKindLocalKey:
 			case AuthKindPrompt:
+			case AuthKindKeyFile:
+				if spec.Machine[k].Auth[i].Key == "" {
+					return errors.New("key file must be specified for keyfile authentication")
+				}
 			case AuthKindPassword:
 				if spec.Machine[k].Auth[i].Password == "" {
 					return errors.New("password must be specified for password authentication")

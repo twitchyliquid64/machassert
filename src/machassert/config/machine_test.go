@@ -56,6 +56,31 @@ func TestSSHBasicTargetsParse(t *testing.T) {
 	}
 }
 
+func TestSSHAuthsTargetsParse(t *testing.T) {
+	spec, err := ParseTargetSpecFile("testdata/targets/sshauths.hcl")
+	if err != nil {
+		t.Error(err)
+	}
+	if spec == nil {
+		t.Fatal("Non-nil spec expected")
+	}
+
+	if spec.Name != "Frontend server" {
+		t.Error("Spec name is incorrect")
+	}
+
+	m1 := spec.Machine["frontend-1"]
+
+	if m1.Kind != KindSSH || m1.Destination != "10.5.32.1" {
+		t.Error("Incorrect data, got: ", spew.Sdump(spec.Machine))
+	}
+
+	// This also tests our validation, which sets the kind to AuthKindKeyFile
+	if len(m1.Auth) != 1 || m1.Auth[0].Kind != AuthKindKeyFile || m1.Auth[0].Key == "" {
+		t.Error("Incorrect auth data, got: ", spew.Sdump(m1.Auth))
+	}
+}
+
 func TestBasicTargetsParseErrorCases(t *testing.T) {
 	spec, err := ParseTargetSpecFile("testdata/targets/doesnt_exist.hcl")
 	if err == nil {
